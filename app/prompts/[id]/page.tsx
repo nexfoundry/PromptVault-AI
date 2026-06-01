@@ -18,11 +18,11 @@ interface PromptDetails {
   tags: string[];
 }
 
-// Mock data - Replace with actual data fetching from Supabase
 const mockPrompt: PromptDetails = {
   id: '1',
   title: 'Creative Writing Assistant',
-  description: 'Generate creative writing prompts and stories with this powerful AI assistant.',
+  description:
+    'Generate creative writing prompts and stories with this powerful AI assistant.',
   content: `You are a creative writing assistant designed to help writers overcome writer's block and generate engaging content. Your role is to:
 
 1. Provide writing prompts based on the user's genre preference
@@ -45,17 +45,14 @@ When responding:
   tags: ['writing', 'creative', 'storytelling', 'ai-assistant'],
 };
 
-export default function PromptDetailPage({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default function PromptDetailPage() {
   const [isCopied, setIsCopied] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
+
   const prompt = mockPrompt;
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(prompt.content);
+  const handleCopy = async () => {
+    await navigator.clipboard.writeText(prompt.content);
     setIsCopied(true);
     setTimeout(() => setIsCopied(false), 2000);
   };
@@ -67,58 +64,64 @@ export default function PromptDetailPage({
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-secondary-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
-        {/* Back Button */}
-        <Link href="/explore" className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-8 transition-smooth">
+        <Link
+          href="/explore"
+          className="inline-flex items-center text-primary-600 hover:text-primary-700 mb-8"
+        >
           <ArrowLeft className="w-4 h-4 mr-2" />
           Back to Explore
         </Link>
 
-        {/* Header */}
         <div className="card p-8 mb-8">
           <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-6">
             <div>
               <h1 className="text-4xl font-bold text-secondary-900 mb-2">
                 {prompt.title}
               </h1>
+
               <p className="text-lg text-secondary-600 mb-4">
                 {prompt.description}
               </p>
+
               <div className="flex flex-wrap gap-4">
                 <span className="inline-flex items-center gap-1 text-secondary-600">
-                  <Star className="w-4 h-4 fill-accent-500 text-accent-500" />
+                  <Star className="w-4 h-4" />
                   {prompt.rating} ({prompt.views} views)
                 </span>
-                <span className="text-secondary-600">By {prompt.author}</span>
-                <span className="text-secondary-600">{prompt.createdAt}</span>
+
+                <span className="text-secondary-600">
+                  By {prompt.author}
+                </span>
+
+                <span className="text-secondary-600">
+                  {prompt.createdAt}
+                </span>
               </div>
             </div>
+
             <div className="flex gap-2 mt-4 sm:mt-0">
               <button
                 onClick={handleLike}
-                className={`p-3 rounded-lg transition-smooth ${
-                  isLiked
-                    ? 'bg-error-100 text-error-600'
-                    : 'bg-secondary-100 text-secondary-600 hover:bg-secondary-200'
-                }`}
-                title="Like this prompt"
+                className="p-3 rounded-lg bg-secondary-100"
               >
-                <Heart className={`w-5 h-5 ${isLiked ? 'fill-current' : ''}`} />
+                <Heart
+                  className={`w-5 h-5 ${
+                    isLiked ? 'fill-current text-red-500' : ''
+                  }`}
+                />
               </button>
-              <button
-                className="p-3 rounded-lg bg-secondary-100 text-secondary-600 hover:bg-secondary-200 transition-smooth"
-                title="Share this prompt"
-              >
+
+              <button className="p-3 rounded-lg bg-secondary-100">
                 <Share2 className="w-5 h-5" />
               </button>
             </div>
           </div>
 
-          {/* Tags */}
           <div className="flex flex-wrap gap-2">
             {prompt.tags.map((tag) => (
               <span
                 key={tag}
-                className="inline-block px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
+                className="px-3 py-1 bg-primary-100 text-primary-700 rounded-full text-sm"
               >
                 #{tag}
               </span>
@@ -126,47 +129,47 @@ export default function PromptDetailPage({
           </div>
         </div>
 
-        {/* Category Badge */}
         <div className="mb-8">
-          <span className="inline-block px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium">
+          <span className="px-4 py-2 bg-primary-600 text-white rounded-lg text-sm font-medium">
             {prompt.category}
           </span>
         </div>
 
-        {/* Prompt Content */}
         <div className="card p-8 mb-8">
-          <h2 className="text-2xl font-bold text-secondary-900 mb-4">
+          <h2 className="text-2xl font-bold mb-4">
             Prompt Content
           </h2>
-          <div className="bg-secondary-50 rounded-lg p-6 mb-4 border border-secondary-200">
-            <pre className="whitespace-pre-wrap text-secondary-700 font-mono text-sm">
+
+          <div className="bg-secondary-50 rounded-lg p-6 mb-4 border">
+            <pre className="whitespace-pre-wrap text-sm">
               {prompt.content}
             </pre>
           </div>
+
           <button
             onClick={handleCopy}
-            className={`btn-primary flex items-center gap-2 ${
-              isCopied ? 'bg-success-600 hover:bg-success-700' : ''
-            }`}
+            className="btn-primary flex items-center gap-2"
           >
             <Copy className="w-4 h-4" />
             {isCopied ? 'Copied!' : 'Copy Prompt'}
           </button>
         </div>
 
-        {/* Author Info */}
         <div className="card p-8">
-          <h2 className="text-2xl font-bold text-secondary-900 mb-4">
+          <h2 className="text-2xl font-bold mb-4">
             About the Author
           </h2>
+
           <div className="flex items-center gap-4">
-            <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
+            <div className="w-16 h-16 bg-primary-600 rounded-full flex items-center justify-center text-white text-2xl font-bold">
               {prompt.author.charAt(0)}
             </div>
+
             <div>
-              <p className="text-lg font-semibold text-secondary-900">
+              <p className="text-lg font-semibold">
                 {prompt.author}
               </p>
+
               <p className="text-secondary-600">
                 Prompt Creator • {prompt.views} views across all prompts
               </p>
