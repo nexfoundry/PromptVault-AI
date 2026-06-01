@@ -1,15 +1,40 @@
+'use server';
+
 import { createClient } from '@supabase/supabase-js';
+import type { SupabaseClient } from '@supabase/supabase-js';
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabaseAdmin: SupabaseClient | null = supabaseServiceKey
+  ? createClient(supabaseUrl, supabaseServiceKey)
+  : null;
 
-// Auth helper functions
+interface PromptUpdateInput {
+  title?: string;
+  description?: string;
+  content?: string;
+  category?: string;
+  tags?: string[];
+  views?: number;
+  likes?: number;
+  rating?: number;
+}
+
+interface PromptCreateInput {
+  title: string;
+  description: string;
+  content: string;
+  category: string;
+  tags: string[];
+}
+
 export async function signUp(email: string, password: string) {
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -49,7 +74,6 @@ export async function getCurrentUser() {
   return data.session?.user ?? null;
 }
 
-// Prompt helper functions
 export async function getPrompts(limit = 10) {
   const { data, error } = await supabase
     .from('prompts')
@@ -78,13 +102,7 @@ export async function getPromptById(id: string) {
   return data;
 }
 
-export async function createPrompt(prompt: {
-  title: string;
-  description: string;
-  content: string;
-  category: string;
-  tags: string[];
-}) {
+export async function createPrompt(prompt: PromptCreateInput) {
   const user = await getCurrentUser();
 
   if (!user) {
@@ -110,10 +128,13 @@ export async function createPrompt(prompt: {
     throw new Error(error.message);
   }
 
-  return data[0];
+  return data?.[0];
 }
 
-export async function updatePrompt(id: string, updates: Partial<any>) {
+export async function updatePrompt(
+  id: string,
+  updates: PromptUpdateInput
+) {
   const { data, error } = await supabase
     .from('prompts')
     .update(updates)
@@ -124,7 +145,7 @@ export async function updatePrompt(id: string, updates: Partial<any>) {
     throw new Error(error.message);
   }
 
-  return data[0];
+  return data?.[0];
 }
 
 export async function deletePrompt(id: string) {
